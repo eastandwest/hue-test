@@ -20,16 +20,17 @@ function getConf(res) {
   const hostname = res[0].ipaddress;
   const api = new HueApi(hostname, username);
 
-  logger.info(hostname);
 
   api.lights().then( res => {
-    logger.info(res);
-    let sw = res.lights[0].state.on;
-    let state = lightState.create().on(!sw);
-    api.setLightState(1, state).then(res => {
-      logger.info(JSON.stringify(res, null, 2));
-    }).catch(err => {
-      logger.warn(err);
+    res.lights.forEach( (light) => {
+      let id = light.id;
+      let on = light.state.on;
+      let state = lightState.create().on(!on);
+      api.setLightState(id, state).then(res => {
+        logger.info(JSON.stringify(res, null, 2));
+      }).catch(err => {
+        logger.warn(err);
+      });
     });
   }).catch(err => {
     logger.warn(err);
